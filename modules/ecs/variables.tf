@@ -24,7 +24,7 @@ variable "min_size" {
 variable "max_size" {
   description = "Maximum size of the ECS cluster"
   type        = number
-  default     = 3
+  default     = 1
 }
 
 variable "desired_capacity" {

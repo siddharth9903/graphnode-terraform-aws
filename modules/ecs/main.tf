@@ -11,40 +11,42 @@ resource "aws_launch_template" "ecs" {
   name_prefix   = "${var.cluster_name}-lt-"
   image_id      = var.ami_id
   instance_type = var.instance_type
+  default_version = 1
 
   network_interfaces {
     associate_public_ip_address = true
     security_groups             = [aws_security_group.ecs.id]
   }
 
+#   iam_instance_profile {
+#     name = aws_iam_instance_profile.ecs.name
+#   }
   iam_instance_profile {
-    name = aws_iam_instance_profile.ecs.name
+    arn = aws_iam_instance_profile.ecs.arn
   }
 
-#   user_data = base64encode(<<-EOF
-#               #!/bin/bash
-#               echo ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config
-#               EOF
-#   )
 
-#   user_data = base64encode(<<-EOF
-#               #!/bin/bash
-#               echo ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config
-#               echo ECS_ENABLE_CONTAINER_METADATA=true >> /etc/ecs/ecs.config
-#               echo ECS_ENABLE_SPOT_INSTANCE_DRAINING=true >> /etc/ecs/ecs.config
-#               systemctl restart ecs
-#               EOF
-#   )
   user_data = base64encode(<<-EOF
               #!/bin/bash
               echo "ECS_CLUSTER=${var.cluster_name}" >> /etc/ecs/ecs.config
-              echo "ECS_ENABLE_CONTAINER_METADATA=true" >> /etc/ecs/ecs.config
-              echo "ECS_ENABLE_SPOT_INSTANCE_DRAINING=true" >> /etc/ecs/ecs.config
-              yum update -y
-              yum install -y ecs-init
-              systemctl enable --now ecs
               EOF
   )
+
+#   systemctl restart ecs
+
+
+#   user_data = filebase64("${path.module}/ecs.sh")
+
+#   user_data = base64encode(templatefile("${path.module}/ecs.sh", {
+#     cluster_name = var.cluster_name
+#   }))
+
+  tag_specifications {
+    resource_type = "instance"
+      tags = {
+        Name = "ecs-instance"
+      }
+ }
 }
 
 resource "aws_autoscaling_group" "ecs" {
@@ -54,19 +56,10 @@ resource "aws_autoscaling_group" "ecs" {
   max_size            = var.max_size
   desired_capacity    = var.desired_capacity
 
-#   launch_template {
-#     id      = aws_launch_template.ecs.id
-#     version = "$Latest"
-#   }
-  mixed_instances_policy {
-    launch_template {
-      launch_template_specification {
-        launch_template_id = aws_launch_template.ecs.id
-        version            = "$Latest"
-      }
-    }
+  launch_template {
+    id      = aws_launch_template.ecs.id
+    version = "$Latest"
   }
-
 
   tag {
     key                 = "AmazonECSManaged"
@@ -84,7 +77,7 @@ resource "aws_ecs_capacity_provider" "main" {
       maximum_scaling_step_size = 1000
       minimum_scaling_step_size = 1
       status                    = "ENABLED"
-      target_capacity           = 100
+      target_capacity           = 1
     }
   }
 }
@@ -112,6 +105,12 @@ resource "aws_ecs_task_definition" "graphnode" {
   cpu                      = 1024
   memory                   = 3072
 #   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+#   execution_role_arn = "arn:aws:iam::532199187081:role/ecsTaskExecutionRole"
+  
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "X86_64"
+  }
 
   container_definitions = jsonencode([
     {
@@ -184,6 +183,14 @@ resource "aws_ecs_service" "graphnode" {
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.main.name
     weight            = 100
+    base              = 1
+  }
+  triggers = {
+    redeployment = timestamp()
+  }
+  force_new_deployment = true
+  placement_constraints {
+    type = "distinctInstance"
   }
 
   network_configuration {
@@ -203,19 +210,21 @@ resource "aws_ecs_service" "graphnode" {
     container_port   = 8001
   }
 
-  deployment_circuit_breaker {
-    enable   = true
-    rollback = true
-  }
+#   deployment_circuit_breaker {
+#     enable   = true
+#     rollback = true
+#   }
 
-  deployment_maximum_percent         = 200
-  deployment_minimum_healthy_percent = 100
+#   deployment_maximum_percent         = 200
+#   deployment_minimum_healthy_percent = 100
 
-  enable_ecs_managed_tags = true
-  propagate_tags          = "SERVICE"
+#   enable_ecs_managed_tags = true
+#   propagate_tags          = "SERVICE"
 
-  # Add health check grace period
-  health_check_grace_period_seconds = 300
+#   # Add health check grace period
+#   health_check_grace_period_seconds = 300
+
+  depends_on = [aws_autoscaling_group.ecs]
   
 }
 
@@ -226,10 +235,18 @@ resource "aws_security_group" "ecs" {
 
   ingress {
     from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  ingress {
+  from_port   = 0
+  to_port     = 65535
+  protocol    = "tcp"
+  self        = true
+  description = "Allow inter-container communication"
+}
 
   egress {
     from_port   = 0
@@ -261,10 +278,16 @@ resource "aws_iam_role" "ecs_instance_role" {
 #   role       = aws_iam_role.ecs_instance_role.name
 #   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 # }
+
 resource "aws_iam_role_policy_attachment" "ecs_instance_role_policy" {
   role       = aws_iam_role.ecs_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
+
+# resource "aws_iam_role_policy_attachment" "ecs_instance_role_policy" {
+#   role       = aws_iam_role.ecs_instance_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+# }
 
 resource "aws_iam_instance_profile" "ecs" {
   name = "${var.cluster_name}-ecs-instance-profile"
@@ -309,7 +332,7 @@ resource "aws_lb_target_group" "graphnode_8000" {
     unhealthy_threshold = 2
     timeout             = 3
     interval            = 30
-    matcher             = "200-399"
+    matcher             = "200-499"
   }
 }
 
@@ -328,7 +351,7 @@ resource "aws_lb_target_group" "graphnode_8001" {
     unhealthy_threshold = 2
     timeout             = 3
     interval            = 30
-    matcher             = "200-399"
+    matcher             = "200-499"
   }
 }
 

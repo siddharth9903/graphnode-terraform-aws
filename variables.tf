@@ -68,10 +68,10 @@ variable "cluster_name" {
   default     = "gn-ec2-cluster"
 }
 
-variable "ecs_ami_id" {
-  description = "The AMI ID for the ECS instances"
-  type        = string
-}
+# variable "ecs_ami_id" {
+#   description = "The AMI ID for the ECS instances"
+#   type        = string
+# }
 
 variable "instance_type" {
   description = "The instance type for the ECS instances"
@@ -88,7 +88,7 @@ variable "min_size" {
 variable "max_size" {
   description = "The maximum size of the ECS cluster"
   type        = number
-  default     = 3
+  default     = 2
 }
 
 variable "desired_capacity" {
