@@ -83,3 +83,18 @@ variable "ethereum_url" {
   description = "Ethereum URL"
   type        = string
 }
+
+variable "key_name" {
+  description = "Name of the EC2 key pair to use"
+  type        = string
+}
+
+variable "domain_name" {
+  description = "Domain name for the ALB and SSL certificate"
+  type        = string
+}
+
+variable "route53_zone_id" {
+  description = "ID of the Route 53 hosted zone"
+  type        = string
+}

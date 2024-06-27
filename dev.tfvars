@@ -2,7 +2,7 @@ aws_region = "us-east-1"
 
 vpc_cidr             = "10.0.0.0/16"
 public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
-private_subnet_cidrs = ["10.0.3.0/24", "10.0.4.0/24"]
+# private_subnet_cidrs = ["10.0.3.0/24", "10.0.4.0/24"]
 availability_zones   = ["us-east-1a", "us-east-1b"]
 
 # db_cluster_identifier = "graphnode-db-cluster-dev"
@@ -26,6 +26,7 @@ ipfs_url     = "http://100.27.85.244:5001"
 ethereum_url = "base:https://virtual.base.rpc.tenderly.co/7817edf3-f43a-4498-9cf9-c44c0164e1ed"
 
 ec2_ami  = "ami-01b799c439fd5516a" # Replace with the latest Amazon Linux 2 AMI ID
-key_name = "dev-key-pair"
+key_name = "apecity-ssh-keypair"
 
-# ami-0422d936d535c63b1
+domain_name = "tend.apecity.xyz"
+route53_zone_id = "Z0296707AHL64NN8DXS8"

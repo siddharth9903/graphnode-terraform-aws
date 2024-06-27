@@ -16,11 +16,11 @@ variable "public_subnet_cidrs" {
   default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
-variable "private_subnet_cidrs" {
-  description = "The CIDR blocks for the private subnets"
-  type        = list(string)
-  default     = ["10.0.3.0/24", "10.0.4.0/24"]
-}
+# variable "private_subnet_cidrs" {
+#   description = "The CIDR blocks for the private subnets"
+#   type        = list(string)
+#   default     = ["10.0.3.0/24", "10.0.4.0/24"]
+# }
 
 variable "availability_zones" {
   description = "The availability zones to use for subnets"
@@ -140,4 +140,14 @@ variable "dev_backup_retention" {
   description = "The number of days to retain backups for in non-production environments"
   type        = number
   default     = 1
+}
+
+variable "domain_name" {
+  description = "Domain name for the ALB and SSL certificate"
+  type        = string
+}
+
+variable "route53_zone_id" {
+  description = "ID of the Route 53 hosted zone"
+  type        = string
 }

@@ -1,3 +1,4 @@
+
 provider "aws" {
   region = var.aws_region
 }
@@ -11,7 +12,7 @@ module "vpc" {
 
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
+#   private_subnet_cidrs = var.private_subnet_cidrs
   availability_zones   = var.availability_zones
 }
 
@@ -60,7 +61,8 @@ module "ecs" {
   max_size             = var.max_size
   desired_capacity     = var.desired_capacity
   vpc_id               = module.vpc.vpc_id
-  subnet_ids           = module.vpc.private_subnet_ids
+#   subnet_ids           = module.vpc.private_subnet_ids
+  subnet_ids           = module.vpc.public_subnet_ids
   task_definition_name = each.value.task_definition_name
   container_image      = var.container_image
 #   postgres_host        = module.rds.rds_endpoint
@@ -71,6 +73,9 @@ module "ecs" {
   postgres_db          = "graph_node_dev"
   ipfs_url             = var.ipfs_url
   ethereum_url         = var.ethereum_url
+  key_name             = var.key_name
+  domain_name          = var.domain_name
+  route53_zone_id      = var.route53_zone_id
 }
 
 # resource "aws_security_group_rule" "rds_ingress_ecs" {
@@ -102,10 +107,10 @@ output "vpc_id" {
   value = module.vpc.vpc_id
 }
 
-# Output the private subnet IDs
-output "private_subnet_ids" {
-  value = module.vpc.private_subnet_ids
-}
+# # Output the private subnet IDs
+# output "private_subnet_ids" {
+#   value = module.vpc.private_subnet_ids
+# }
 
 # Output the public subnet IDs
 output "public_subnet_ids" {
