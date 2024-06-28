@@ -187,12 +187,12 @@ resource "aws_security_group" "ecs" {
   description = "Security group for ECS cluster"
   vpc_id      = var.vpc_id
 
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+#   ingress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
 
   ingress {
     from_port   = 0
@@ -253,11 +253,75 @@ resource "aws_lb" "graphnode" {
   subnets            = var.subnet_ids
 }
 
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.graphnode.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = 443
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 resource "aws_lb_listener" "graphnode" {
   load_balancer_arn = aws_lb.graphnode.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate_validation.cert.certificate_arn
 
-  port     = 80
-  protocol = "HTTP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.graphnode_8000.arn
+  }
+}
+
+
+resource "aws_acm_certificate" "cert" {
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "cert_validation" {
+  allow_overwrite = true
+  name    = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_name
+  type    = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_type
+  zone_id = var.route53_zone_id
+  records = [tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_value]
+  ttl     = 60
+}
+
+resource "aws_acm_certificate_validation" "cert" {
+  certificate_arn         = aws_acm_certificate.cert.arn
+  validation_record_fqdns = [aws_route53_record.cert_validation.fqdn]
+}
+
+# resource "aws_lb" "graphnode" {
+#   name               = "${var.cluster_name}-alb"
+#   internal           = false
+#   load_balancer_type = "application"
+#   security_groups    = [aws_security_group.alb.id]
+#   subnets            = var.subnet_ids
+# }
+
+# resource "aws_lb_listener" "graphnode" {
+#   load_balancer_arn = aws_lb.graphnode.arn
+
+#   port              = 80
+#   protocol          = "HTTP"
+# #   port              = 443
+# #   protocol          = "HTTPS"
+# #   ssl_policy        = "ELBSecurityPolicy-2016-08"
+# #   certificate_arn   = aws_acm_certificate_validation.cert.certificate_arn
 
 #   default_action {
 #     type = "fixed-response"
@@ -267,11 +331,10 @@ resource "aws_lb_listener" "graphnode" {
 #       status_code  = "404"
 #     }
 #   }
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.graphnode_8000.arn
-  }
-}
+
+# #   depends_on = [aws_acm_certificate_validation.cert]
+# }
+
 
 resource "aws_lb_target_group" "graphnode_8000" {
   name        = "${var.cluster_name}-tg-8000"
@@ -351,9 +414,16 @@ resource "aws_security_group" "alb" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -362,6 +432,18 @@ resource "aws_security_group" "alb" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_route53_record" "graphnode" {
+  zone_id = var.route53_zone_id
+  name    = var.domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.graphnode.dns_name
+    zone_id                = aws_lb.graphnode.zone_id
+    evaluate_target_health = true
   }
 }
 

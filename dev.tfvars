@@ -16,7 +16,7 @@ cluster_name         = "gn-ec2-clr"
 ecs_ami_id           = "ami-01b799c439fd5516a" # Replace with the latest ECS-optimized AMI ID
 instance_type        = "t3.medium"
 min_size             = 1
-max_size             = 2
+max_size             = 1
 desired_capacity     = 1
 
 task_definition_name = "gn-task-ec2"
