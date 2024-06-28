@@ -34,6 +34,11 @@ variable "db_cluster_identifier" {
   default     = "graphnode-db-cluster"
 }
 
+variable "postgres_host" {
+  description = "database host"
+  type        = string
+}
+
 variable "database_name" {
   description = "The name of the database to create"
   type        = string

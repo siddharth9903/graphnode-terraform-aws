@@ -66,7 +66,8 @@ module "ecs" {
   task_definition_name = each.value.task_definition_name
   container_image      = var.container_image
 #   postgres_host        = module.rds.rds_endpoint
-  postgres_host        = "gn-rds-db-ex.cluster-c9keqc40m4bt.us-east-1.rds.amazonaws.com"
+#   postgres_host        = "gn-rds-db-ex.cluster-c9keqc40m4bt.us-east-1.rds.amazonaws.com"
+  postgres_host        = var.postgres_host
   postgres_user        = var.master_username
   postgres_pass        = var.master_password
 #   postgres_db          = var.database_name
