@@ -90,8 +90,8 @@ resource "aws_ecs_task_definition" "graphnode" {
   family                   = var.task_definition_name
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
-  cpu                      = 1024
-  memory                   = 3072
+  cpu                      = 512
+  memory                   = 1536
   
   runtime_platform {
     operating_system_family = "LINUX"
@@ -103,8 +103,8 @@ resource "aws_ecs_task_definition" "graphnode" {
       name  = "graphnode"
       image = var.container_image
       essential = true
-      cpu = 1024
-      memory = 2048
+    #   cpu = 1024
+    #   memory = 2048
       portMappings = [
         {
           containerPort = 8000

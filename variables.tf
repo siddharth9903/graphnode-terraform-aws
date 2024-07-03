@@ -81,7 +81,7 @@ variable "cluster_name" {
 variable "instance_type" {
   description = "The instance type for the ECS instances"
   type        = string
-  default     = "t3.medium"
+  default     = "t2.small"
 }
 
 variable "min_size" {
@@ -132,7 +132,7 @@ variable "prod_db_instance_class" {
 variable "dev_db_instance_class" {
   description = "The instance class to use for non-production RDS clusters"
   type        = string
-  default     = "db.t3.medium"
+  default     = "db.t2.small"
 }
 
 variable "prod_backup_retention" {
