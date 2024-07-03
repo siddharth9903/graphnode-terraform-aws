@@ -1,19 +1,19 @@
 aws_region = "us-east-1"
 
-vpc_cidr             = "10.0.0.0/16"
-public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
-availability_zones   = ["us-east-1a", "us-east-1b"]
+vpc_id = "vpc-00ee55721b41b49c1"
+public_subnet_ids = [
+  "subnet-057ae4d08b59686c4",
+  "subnet-055a4d46ad83aa781",
+]
 
-# db_cluster_identifier = "graphnode-db-cluster-dev"
-# db_cluster_identifier = "gn-rds-db-ex"
 db_cluster_identifier = "gn-rds-psg-db-ex"
 postgres_host         = "gn-rds-psg-db-ex.c9keqc40m4bt.us-east-1.rds.amazonaws.com"
 database_name         = "graph_node_dev"
 master_username       = "postgres"
 master_password       = "postgres" # Change this to a secure password
 
-ecs_cluster_name         = "gn-ec2-clr"
-ecs_ami_id           = "ami-01b799c439fd5516a" # Replace with the latest ECS-optimized AMI ID
+ecs_cluster_name     = "gn-ec2-clr-dev"
+# ecs_ami_id           = "ami-01b799c439fd5516a" # Replace with the latest ECS-optimized AMI ID
 instance_type        = "t2.small"
 min_size             = 1
 max_size             = 1
