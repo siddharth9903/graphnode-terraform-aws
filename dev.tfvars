@@ -23,7 +23,7 @@ task_definition_name = "gn-task-ec2-dev"
 container_image      = "siddharth9903/graphnode:latest"
 
 ipfs_url     = "http://54.147.64.98:5001"
-ethereum_url = "base:https://virtual.base.rpc.tenderly.co/c070adf9-120d-4186-95f8-ca0978df9c08"
+ethereum_url = "baseTenderly:https://virtual.base.rpc.tenderly.co/b67fff04-bd69-4b14-907a-3912e44f3f1d"
 
 ec2_ami  = "ami-01b799c439fd5516a" # Replace with the latest Amazon Linux 2 AMI ID
 key_name = "apecity-ssh-keypair"
