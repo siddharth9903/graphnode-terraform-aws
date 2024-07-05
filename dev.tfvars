@@ -1,9 +1,9 @@
 aws_region = "us-east-1"
 
-vpc_id = "vpc-00ee55721b41b49c1"
+vpc_id = "vpc-0a7e77168de71fbdd"
 public_subnet_ids = [
-  "subnet-057ae4d08b59686c4",
-  "subnet-055a4d46ad83aa781",
+  "subnet-0dfa98f8e42f2c472",
+  "subnet-0f5ebfa1ccd1954c1",
 ]
 
 db_cluster_identifier = "gn-rds-psg-db-ex"
@@ -22,8 +22,8 @@ desired_capacity     = 1
 task_definition_name = "gn-task-ec2-dev"
 container_image      = "siddharth9903/graphnode:latest"
 
-ipfs_url     = "http://18.206.168.62:5001"
-ethereum_url = "base:https://virtual.base.rpc.tenderly.co/3fbaeb11-e428-4845-9be3-91c242fe550d"
+ipfs_url     = "http://54.147.64.98:5001"
+ethereum_url = "base:https://virtual.base.rpc.tenderly.co/c070adf9-120d-4186-95f8-ca0978df9c08"
 
 ec2_ami  = "ami-01b799c439fd5516a" # Replace with the latest Amazon Linux 2 AMI ID
 key_name = "apecity-ssh-keypair"
