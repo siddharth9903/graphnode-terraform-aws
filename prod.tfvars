@@ -22,7 +22,7 @@ desired_capacity     = 1
 task_definition_name = "gn-task-ec2-prod"
 container_image      = "siddharth9903/graphnode:latest"
 
-ipfs_url     = "http://54.147.64.98:5001"
+ipfs_url     = "http://18.208.209.235:5001"
 ethereum_url = "base:https://base.gateway.tenderly.co/5hihJD3KoAdswisWt96oTm"
 
 ec2_ami  = "ami-01b799c439fd5516a" # Replace with the latest Amazon Linux 2 AMI ID

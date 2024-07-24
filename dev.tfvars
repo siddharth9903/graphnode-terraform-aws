@@ -20,10 +20,10 @@ max_size             = 1
 desired_capacity     = 1
 
 task_definition_name = "gn-task-ec2-dev"
-container_image      = "siddharth9903/graphnode:latest"
+container_image      = "graphprotocol/graph-node"
 
-ipfs_url     = "http://54.147.64.98:5001"
-ethereum_url = "baseTenderly:https://virtual.base.rpc.tenderly.co/b67fff04-bd69-4b14-907a-3912e44f3f1d"
+ipfs_url     = "http://18.208.209.235:5001"
+ethereum_url = "tenderly:https://virtual.base.rpc.tenderly.co/3f03ea4a-aebd-445c-94ca-22dee8209cb8"
 
 ec2_ami  = "ami-01b799c439fd5516a" # Replace with the latest Amazon Linux 2 AMI ID
 key_name = "apecity-ssh-keypair"
