@@ -1,3 +1,4 @@
+
 aws_region = "us-east-1"
 
 vpc_id = "vpc-0a7e77168de71fbdd"
@@ -22,11 +23,11 @@ desired_capacity     = 1
 task_definition_name = "gn-task-ec2-dev"
 container_image      = "graphprotocol/graph-node"
 
-ipfs_url     = "http://18.208.209.235:5001"
-ethereum_url = "tenderly:https://virtual.base.rpc.tenderly.co/3f03ea4a-aebd-445c-94ca-22dee8209cb8"
+ipfs_url     = "http://54.167.234.233:5001"
+ethereum_url = "merlintestnet:https://testnet-rpc.merlinchain.io"
 
 ec2_ami  = "ami-01b799c439fd5516a" # Replace with the latest Amazon Linux 2 AMI ID
 key_name = "apecity-ssh-keypair"
 
-domain_name = "tend.apecity.xyz"
+domain_name = "test.apecity.xyz"
 route53_zone_id = "Z0296707AHL64NN8DXS8"
